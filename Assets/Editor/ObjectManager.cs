@@ -16,7 +16,7 @@ public static class ObjectManager
         foreach (string path in assetPaths)
         {
             Object asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-            if (asset != null)
+            if (asset != null && PrefabUtility.IsPartOfAnyPrefab(asset))
             {
                 _assets.Add(asset);
             }
