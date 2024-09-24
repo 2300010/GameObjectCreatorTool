@@ -1,1 +1,1 @@
-C:\GameObjectCreator
+C:\GameObjectCreator\GameObjectCreatorTool
