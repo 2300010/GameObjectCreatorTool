@@ -10,10 +10,18 @@ public class ObjectCreatorWindow : EditorWindow
     private List<Object> assetsFound = new List<Object>();
     private int selectedIndex;
 
+
+
     private void OnEnable()
     {
         ObjectManager.FillAssetList();
         assetsFound = ObjectManager.Assets;
+    }
+
+    private void OnDisable()
+    {
+        ObjectManager.Assets = null;
+        assetsFound = null;
     }
 
     [MenuItem("Tools/Object Creator")]
@@ -30,6 +38,8 @@ public class ObjectCreatorWindow : EditorWindow
 
         objectScale = EditorGUILayout.Slider("Object Scale", objectScale, 0.1f, 10f);
 
+
+
         if (GUILayout.Button("Create Cube"))
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -43,12 +53,13 @@ public class ObjectCreatorWindow : EditorWindow
             sphere.name = objectName;
             sphere.transform.localScale = Vector3.one * objectScale;
         }
-        
+
         if (assetsFound != null && assetsFound.Count > 0)
         {
             string[] assetNames = new string[assetsFound.Count];
             for (int i = 0; i < assetsFound.Count; i++)
             {
+                Debug.Log("Asset found = " + assetsFound[i].name);
                 assetNames[i] = assetsFound[i].name; // Get the name of each asset for the dropdown
             }
 
@@ -69,13 +80,28 @@ public class ObjectCreatorWindow : EditorWindow
             EditorGUILayout.LabelField("No assets found.");
         }
 
-        if(GUILayout.Button("Create Selected Prefab"))
+        if (GUILayout.Button("Create Selected Prefab"))
         {
-            GameObject prefab = (GameObject)assetsFound[selectedIndex];
+            GameObject prefab = new GameObject();
+            //for (int i = 0; i < assetsFound[selectedIndex].pre; i++)
+            //{
+
+            //}
             prefab.name = objectName;
             prefab.transform.localScale = Vector3.one * objectScale;
 
             Instantiate(prefab);
         }
+
+        if (GUILayout.Button("Reset Tool"))
+        {
+            OnDisable();
+            OnEnable();
+        }
+    }
+
+    private void SetButtonsOfTool()
+    {
+
     }
 }
