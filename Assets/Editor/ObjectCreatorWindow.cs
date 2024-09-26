@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
+[CustomEditor(typeof(ObjectPlacer))]
 public class ObjectCreatorWindow : EditorWindow
 {
     private string objectName = "New Object";
@@ -13,6 +14,7 @@ public class ObjectCreatorWindow : EditorWindow
     private PrimitiveType selectedPrimitiveType = PrimitiveType.Cube;
 
     private GameObject selectedPrefab;
+    private bool showObjectSettings = false;
 
     [MenuItem("Tools/Object Creator")]
     public static void ShowWindow()
@@ -22,22 +24,27 @@ public class ObjectCreatorWindow : EditorWindow
 
     private void OnGUI()
     {
-
-        EditorGUILayout.LabelField("New Object Parameters", EditorStyles.boldLabel);
-
-        objectName = EditorGUILayout.TextField("Object Name", objectName);
-        objectScale = EditorGUILayout.Slider("Object Scale", objectScale, 0.1f, 10f);
-        objectPosition = EditorGUILayout.Vector3Field("Object Position", objectPosition);
+        ShowObjectParametersUI();
 
         SelectGameObjectType();
-
-        //EditorGUILayout.LabelField("Select Prefab", EditorStyles.boldLabel);
-        //selectedPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", selectedPrefab, typeof(GameObject), false);
 
         InstantiateSelectedGameObject();
 
     }
 
+    private void ShowObjectParametersUI()
+    {
+        showObjectSettings = EditorGUILayout.Foldout(showObjectSettings, "Object Settings", true);
+
+        if (showObjectSettings)
+        {
+            EditorGUILayout.LabelField("Parameters", EditorStyles.boldLabel);
+
+            objectName = EditorGUILayout.TextField("Object Name", objectName);
+            objectScale = EditorGUILayout.Slider("Object Scale", objectScale, 0.1f, 10f);
+            objectPosition = EditorGUILayout.Vector3Field("Object Position", objectPosition);
+        }
+    }
 
     private void SelectGameObjectType()
     {
@@ -56,7 +63,6 @@ public class ObjectCreatorWindow : EditorWindow
 
                 selectedPrimitiveType = (PrimitiveType)EditorGUILayout.EnumPopup("Primitive Type", selectedPrimitiveType);
 
-                // Button to instantiate the selected primitive
                 if (GUILayout.Button("Instantiate Primitive"))
                 {
                     instance = GameObject.CreatePrimitive(selectedPrimitiveType);
@@ -64,13 +70,17 @@ public class ObjectCreatorWindow : EditorWindow
 
                     Undo.RegisterCreatedObjectUndo(instance, "Instantiate Primitive");
                 }
+
+                if (GUILayout.Button("Place Primitive Manually"))
+                {
+
+                }
                 break;
 
             case ObjectType.Prefab:
-                // Show prefab selection field
+                
                 selectedPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", selectedPrefab, typeof(GameObject), false);
 
-                // Check if a valid prefab is selected
                 if (selectedPrefab != null && PrefabUtility.IsPartOfPrefabAsset(selectedPrefab))
                 {
                     if (GUILayout.Button("Instantiate Prefab"))
@@ -79,6 +89,11 @@ public class ObjectCreatorWindow : EditorWindow
                         SetGameObjectParameters(instance);
 
                         Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
+                    }
+
+                    if (GUILayout.Button("Place Prefab Manually"))
+                    {
+
                     }
                 }
                 else
@@ -96,4 +111,5 @@ public class ObjectCreatorWindow : EditorWindow
         instance.transform.localPosition = objectPosition;
     }
 
+    
 }
