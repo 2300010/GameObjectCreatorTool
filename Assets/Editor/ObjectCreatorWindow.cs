@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,22 +5,8 @@ public class ObjectCreatorWindow : EditorWindow
 {
     private string objectName = "New Object";
     private float objectScale = 1f;
-    private List<Object> assetsFound = new List<Object>();
-    private int selectedIndex;
 
-
-
-    private void OnEnable()
-    {
-        ObjectManager.FillAssetList();
-        assetsFound = ObjectManager.Assets;
-    }
-
-    private void OnDisable()
-    {
-        ObjectManager.Assets = null;
-        assetsFound = null;
-    }
+    private GameObject selectedPrefab;
 
     [MenuItem("Tools/Object Creator")]
     public static void ShowWindow()
@@ -54,54 +38,28 @@ public class ObjectCreatorWindow : EditorWindow
             sphere.transform.localScale = Vector3.one * objectScale;
         }
 
-        if (assetsFound != null && assetsFound.Count > 0)
+        EditorGUILayout.LabelField("Select Prefab", EditorStyles.boldLabel);
+        selectedPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", selectedPrefab, typeof(GameObject), false);
+
+        if (selectedPrefab != null && PrefabUtility.IsPartOfAnyPrefab(selectedPrefab))
         {
-            string[] assetNames = new string[assetsFound.Count];
-            for (int i = 0; i < assetsFound.Count; i++)
+            if (GUILayout.Button("Instantiate Selected Prefab"))
             {
-                Debug.Log("Asset found = " + assetsFound[i].name);
-                assetNames[i] = assetsFound[i].name; // Get the name of each asset for the dropdown
+                InstantiatePrefab();
             }
-
-            // Create the dropdown menu
-            selectedIndex = EditorGUILayout.Popup("Select Asset", selectedIndex, assetNames);
-
-            // Optionally, you can display the selected asset details
-            //if (GUILayout.Button("Show Selected Asset"))
-            //{
-            //    if (selectedIndex >= 0 && selectedIndex < assetsFound.Count)
-            //    {
-            //        Debug.Log($"Selected Asset: {assetsFound[selectedIndex].name}");
-            //    }
-            //}
         }
         else
         {
-            EditorGUILayout.LabelField("No assets found.");
-        }
-
-        if (GUILayout.Button("Create Selected Prefab"))
-        {
-            GameObject prefab = new GameObject();
-            //for (int i = 0; i < assetsFound[selectedIndex].pre; i++)
-            //{
-
-            //}
-            prefab.name = objectName;
-            prefab.transform.localScale = Vector3.one * objectScale;
-
-            Instantiate(prefab);
-        }
-
-        if (GUILayout.Button("Reset Tool"))
-        {
-            OnDisable();
-            OnEnable();
+            EditorGUILayout.HelpBox("Please select a valid prefab.", MessageType.Warning);
         }
     }
 
-    private void SetButtonsOfTool()
+    private void InstantiatePrefab()
     {
+        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
+        instance.name = objectName;
+        instance.transform.localScale = Vector3.one * objectScale;
 
+        Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
     }
 }
