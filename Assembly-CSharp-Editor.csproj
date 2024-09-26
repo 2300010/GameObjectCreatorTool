@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\ObjectCreatorWindow.cs" />
-    <Compile Include="Assets\Editor\GameObjectCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
