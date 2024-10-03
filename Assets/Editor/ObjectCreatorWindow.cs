@@ -6,6 +6,8 @@ public enum TypeOfObject { Primitive, Prefab }
 //[CustomEditor(typeof(ObjectPlacer))]
 public class ObjectCreatorWindow : EditorWindow
 {
+    ObjectPlacer objectPlacer = new ObjectPlacer();
+    
     private string objectName = "New Object";
     private float objectScale = 1f;
     private Vector3 objectPosition = Vector3.zero;
@@ -17,8 +19,10 @@ public class ObjectCreatorWindow : EditorWindow
     private GameObject selectedPrefab;
     private GameObject previewObject;
 
-    private Material[] originalMaterials = null;
-    private Renderer[] originalRenderers = null;
+    //private Material previewMaterial;
+
+    //private Material[] originalMaterials = null;
+    //private Renderer[] originalRenderers = null;
 
     private bool showObjectSettings = false;
     private bool isPlacingObject = false;
@@ -41,6 +45,10 @@ public class ObjectCreatorWindow : EditorWindow
         {
             CreatePreviewLayer();
         }
+        //if (previewMaterial == null)
+        //{
+        //    SetPreviewMaterialParameters();
+        //}
         previewLayerMask = ~LayerMask.GetMask(PREVIEW_LAYER);
         SceneView.duringSceneGui += OnSceneGUI;
     }
@@ -101,7 +109,7 @@ public class ObjectCreatorWindow : EditorWindow
 
                 if (GUILayout.Button("Place Primitive Manually"))
                 {
-                    previewObject = ObjectPlacer.CreatePreviewPrimitiveObject(selectedPrimitiveType);
+                    previewObject = objectPlacer.CreatePreviewPrimitiveObject(selectedPrimitiveType);
                     previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
                 }
@@ -124,7 +132,7 @@ public class ObjectCreatorWindow : EditorWindow
                     if (GUILayout.Button("Place Prefab Manually"))
                     {
 
-                        previewObject = ObjectPlacer.CreatePreviewPrefabObject(selectedPrefab);
+                        previewObject = objectPlacer.CreatePreviewPrefabObject(selectedPrefab);
                         previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
                     }
@@ -186,7 +194,7 @@ public class ObjectCreatorWindow : EditorWindow
 
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
             {
-                if(selectedObjectType == TypeOfObject.Primitive)
+                if (selectedObjectType == TypeOfObject.Primitive)
                 {
                     ObjectPlacer.PlaceObject(previewObject, selectedPrimitiveType);
                 }
@@ -225,4 +233,16 @@ public class ObjectCreatorWindow : EditorWindow
     {
         return LayerMask.NameToLayer(layerName) != -1;
     }
+
+    //private void SetPreviewMaterialParameters()
+    //{
+    //    previewMaterial.SetFloat("_Mode", 3); // Transparent mode for Standard Shader (3)
+    //    previewMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+    //    previewMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+    //    previewMaterial.SetInt("_ZWrite", 0);
+    //    previewMaterial.DisableKeyword("_ALPHATEST_ON");
+    //    previewMaterial.EnableKeyword("_ALPHABLEND_ON");
+    //    previewMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+    //    previewMaterial.renderQueue = 3000;
+    //}
 }

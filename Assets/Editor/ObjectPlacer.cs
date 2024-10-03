@@ -1,46 +1,57 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
-
-public static class ObjectPlacer
+public class ObjectPlacer
 {
-    public static GameObject CreatePreviewPrimitiveObject(PrimitiveType selectedPrimitiveType)
+    public GameObject CreatePreviewPrimitiveObject(PrimitiveType selectedPrimitiveType)
     {
         GameObject previewObject = GameObject.CreatePrimitive(selectedPrimitiveType);
-        SetObjectTransparency(previewObject, 0.5f);
+        SetObjectToTransparent(previewObject, 0.5f);
         return previewObject;
     }
 
-    public static GameObject CreatePreviewPrefabObject(GameObject selectedPrefab)
+    public GameObject CreatePreviewPrefabObject(GameObject selectedPrefab)
     {
         GameObject previewObject = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-        SetObjectTransparency(previewObject, 0.5f);
+        SetObjectToTransparent(previewObject, 0.5f);
         return previewObject;
     }
 
-    private static void SetObjectTransparency(GameObject previewObject, float transparency)
+    public void SetObjectToTransparent(GameObject previewObject, float transparency)
     {
+        //Debug.Log("Transparency = " + transparency);
         Renderer[] renderers = previewObject.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
-            foreach (var material in renderer.sharedMaterials)
-            {
-                material.SetFloat("_Mode", 3); // Transparent mode for Standard Shader
-                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                material.SetInt("_ZWrite", 0);
-                material.DisableKeyword("_ALPHATEST_ON");
-                material.EnableKeyword("_ALPHABLEND_ON");
-                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.renderQueue = 3000;
+            //Material[] materials = renderer.sharedMaterials;
 
-                Color color = material.color;
+            for (int i = 0; i < renderer.sharedMaterials.Length; i++)
+            {
+                Material clonedMaterial = new Material(renderer.sharedMaterials[i]);
+
+                clonedMaterial.SetFloat("_Mode", 3); // Transparent mode for Standard Shader (3)
+                clonedMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                clonedMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                clonedMaterial.SetInt("_ZWrite", 0);
+                clonedMaterial.DisableKeyword("_ALPHATEST_ON");
+                clonedMaterial.EnableKeyword("_ALPHABLEND_ON");
+                clonedMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                clonedMaterial.renderQueue = 3000;
+
+                Color color = clonedMaterial.color;
                 color.a = transparency;
-                material.color = color;
+                clonedMaterial.color = color;
+
+                renderer.materials[i] = clonedMaterial;
             }
         }
     }
+
+    //public static void SetObjectToStandard(GameObject previewObject)
+    //{
+
+    //}
 
     public static void PlaceObject(GameObject previewObject, PrimitiveType selectedPrimitiveType)
     {
@@ -50,7 +61,7 @@ public static class ObjectPlacer
         if (finalObject != null)
         {
             finalObject.transform.position = previewObject.transform.position;
-            SetObjectTransparency(finalObject, 1f);
+            //SetObjectToTransparent(finalObject, 1f);
             Undo.RegisterCreatedObjectUndo(finalObject, "Place Object");
         }
     }
@@ -62,7 +73,7 @@ public static class ObjectPlacer
         if (finalObject != null)
         {
             finalObject.transform.position = previewObject.transform.position;
-            SetObjectTransparency(finalObject, 1f);
+            //SetObjectToTransparent(finalObject, 1f);
             Undo.RegisterCreatedObjectUndo(finalObject, "Place Object");
         }
     }

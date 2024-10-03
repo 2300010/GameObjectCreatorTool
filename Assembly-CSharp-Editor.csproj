@@ -61,7 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\ObjectCreatorWindow.cs" />
+    <Compile Include="Assets\Editor\ToolManager.cs" />
     <Compile Include="Assets\Editor\ObjectPlacer.cs" />
+    <Compile Include="Assets\Editor\UIController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
