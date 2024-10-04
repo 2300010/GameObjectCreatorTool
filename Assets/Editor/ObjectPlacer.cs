@@ -24,7 +24,8 @@ public class ObjectPlacer
 
         foreach (Renderer renderer in renderers)
         {
-            //Material[] materials = renderer.sharedMaterials;
+            Material[] originalMaterials = renderer.sharedMaterials;
+            Material[] newMaterials = new Material[originalMaterials.Length];
 
             for (int i = 0; i < renderer.sharedMaterials.Length; i++)
             {
@@ -43,8 +44,9 @@ public class ObjectPlacer
                 color.a = transparency;
                 clonedMaterial.color = color;
 
-                renderer.materials[i] = clonedMaterial;
+                newMaterials[i] = clonedMaterial;
             }
+            renderer.materials = newMaterials;
         }
     }
 
