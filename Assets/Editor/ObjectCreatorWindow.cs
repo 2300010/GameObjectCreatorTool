@@ -208,6 +208,13 @@ public class ObjectCreatorWindow : EditorWindow
                 currentEvent.Use();
             }
 
+            if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
+            {
+                DestroyImmediate(previewObject);
+                isPlacingObject = false;
+                currentEvent.Use();
+            }
+
             sceneView.Repaint();
         }
     }
