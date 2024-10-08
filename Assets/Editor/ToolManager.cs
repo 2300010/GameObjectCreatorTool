@@ -1,11 +1,29 @@
+using UnityEditor;
 using UnityEngine;
+
+public enum TypeOfObject { Primitive, Prefab }
 
 public delegate TypeOfObject TypeOfObjectHasChanged(TypeOfObject selectedType);
 public delegate PrimitiveType SelectedPrimitiveTypeChanged(PrimitiveType selectedPrimitiveType);
 public delegate GameObject SelectedPrefabChanged(GameObject selectedPrefab);
 
-public class ToolManager : ScriptableObject
+public class ToolManager : EditorWindow
 {
+    private static ToolManager instance;
+
+    public static ToolManager Instance
+    {
+        get 
+        {
+            if (instance == null)
+            {
+                instance = new ToolManager();
+            }
+            return instance; 
+        }
+    }
+
+
     public TypeOfObjectHasChanged OnTypeOfObjectChange;
     public SelectedPrimitiveTypeChanged OnSelectedPrimitiveTypeChanged;
     public SelectedPrefabChanged OnSelectedPrefabChanged;
@@ -50,4 +68,20 @@ public class ToolManager : ScriptableObject
             }
         }
     }
+
+    //[MenuItem("Tools/Object Creator")]
+    //public static void ShowWindow()
+    //{
+    //    GetWindow<ObjectCreatorWindow>("Object Creator");
+    //}
+
+    //private void OnEnable()
+    //{
+        
+    //}
+
+    //private void OnDisable()
+    //{
+        
+    //}
 }

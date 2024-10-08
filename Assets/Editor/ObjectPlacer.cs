@@ -3,6 +3,19 @@ using UnityEngine;
 
 public class ObjectPlacer
 {
+    private static ObjectPlacer instance;
+    public static ObjectPlacer Instance
+    {
+        get 
+        {
+            if (instance == null)
+            {
+                instance = new ObjectPlacer();
+            }
+            return instance; 
+        }
+    }
+
     public GameObject CreatePreviewPrimitiveObject(PrimitiveType selectedPrimitiveType)
     {
         GameObject previewObject = GameObject.CreatePrimitive(selectedPrimitiveType);
@@ -19,7 +32,6 @@ public class ObjectPlacer
 
     public void SetObjectToTransparent(GameObject previewObject, float transparency)
     {
-        //Debug.Log("Transparency = " + transparency);
         Renderer[] renderers = previewObject.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)

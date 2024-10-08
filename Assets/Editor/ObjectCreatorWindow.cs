@@ -1,25 +1,14 @@
 using UnityEditor;
 using UnityEngine;
 
-public enum TypeOfObject { Primitive, Prefab }
 
-//[CustomEditor(typeof(ObjectPlacer))]
 public class ObjectCreatorWindow : EditorWindow
 {
-    ObjectPlacer objectPlacer = new ObjectPlacer();
-
-    private string objectName = "New Object";
-    private float objectScale = 1f;
-    private Vector3 objectPosition = Vector3.zero;
-
-    private TypeOfObject selectedObjectType = TypeOfObject.Primitive;
-
     private PrimitiveType selectedPrimitiveType = PrimitiveType.Cube;
 
     private GameObject selectedPrefab;
     private GameObject previewObject;
 
-    private bool showObjectSettings = true;
     private bool isPlacingObject = false;
 
     private float objectHeight = 0f;
@@ -51,46 +40,18 @@ public class ObjectCreatorWindow : EditorWindow
 
     private void OnGUI()
     {
-        ShowObjectParametersUI();
+        UIController.Instance.ShowObjectParametersUI();
 
-        SelectGameObjectType();
+        UIController.Instance.ShowSelectGameObjectTypeUI();
 
         InstantiateSelectedGameObject();
-
-    }
-
-    private void ShowObjectParametersUI()
-    {
-        showObjectSettings = EditorGUILayout.Foldout(showObjectSettings, "Object Settings", true);
-
-        if (showObjectSettings)
-        {
-            EditorGUILayout.LabelField("Parameters", EditorStyles.boldLabel);
-
-            objectName = EditorGUILayout.TextField("Object Name", objectName);
-            objectScale = EditorGUILayout.Slider("Object Scale", objectScale, 0.1f, 10f);
-            objectPosition = EditorGUILayout.Vector3Field("Object Position", objectPosition);
-            if (GUILayout.Button("Reset Settings To Default"))
-            {
-                SetDefaultObjectParameters();
-            }
-
-            EditorGUILayout.Space(15);
-        }
-    }
-
-    private void SelectGameObjectType()
-    {
-        GUILayout.Label("Select Object Type", EditorStyles.boldLabel);
-
-        selectedObjectType = (TypeOfObject)EditorGUILayout.EnumPopup("Object Type", selectedObjectType);
     }
 
     private void InstantiateSelectedGameObject()
     {
         GameObject instance;
 
-        switch (selectedObjectType)
+        switch (UIController.Instance.SelectedObjectType)
         {
             case TypeOfObject.Primitive:
 
@@ -99,7 +60,7 @@ public class ObjectCreatorWindow : EditorWindow
                 if (GUILayout.Button("Instantiate Primitive"))
                 {
                     instance = GameObject.CreatePrimitive(selectedPrimitiveType);
-                    SetGameObjectParameters(instance, isPlacingObject);
+                    PropertiesManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                     Selection.activeGameObject = instance;
 
                     Undo.RegisterCreatedObjectUndo(instance, "Instantiate Primitive");
@@ -109,10 +70,10 @@ public class ObjectCreatorWindow : EditorWindow
 
                 if (GUILayout.Button("Place Primitive Manually"))
                 {
-                    previewObject = objectPlacer.CreatePreviewPrimitiveObject(selectedPrimitiveType);
+                    previewObject = ObjectPlacer.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
                     previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
-                    SetGameObjectParameters(previewObject, isPlacingObject);
+                    PropertiesManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                 }
                 break;
 
@@ -125,7 +86,7 @@ public class ObjectCreatorWindow : EditorWindow
                     if (GUILayout.Button("Instantiate Prefab"))
                     {
                         instance = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-                        SetGameObjectParameters(instance, isPlacingObject);
+                        PropertiesManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                         Selection.activeGameObject = instance;
 
                         Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
@@ -135,10 +96,10 @@ public class ObjectCreatorWindow : EditorWindow
 
                     if (GUILayout.Button("Place Prefab Manually"))
                     {
-                        previewObject = objectPlacer.CreatePreviewPrefabObject(selectedPrefab);
+                        previewObject = ObjectPlacer.Instance.CreatePreviewPrefabObject(selectedPrefab);
                         previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
-                        SetGameObjectParameters(previewObject, isPlacingObject);
+                        PropertiesManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                     }
                 }
                 else
@@ -146,30 +107,6 @@ public class ObjectCreatorWindow : EditorWindow
                     EditorGUILayout.HelpBox("Please select a valid prefab.", MessageType.Warning);
                 }
                 break;
-        }
-    }
-
-    private void SetDefaultObjectParameters()
-    {
-        GUI.FocusControl(null);
-
-        objectName = "New Object";
-        objectScale = 1f;
-        objectPosition = Vector3.zero;
-    }
-
-    private void SetGameObjectParameters(GameObject instance, bool isPlacingObject)
-    {
-        if (!isPlacingObject)
-        {
-            instance.name = objectName;
-            instance.transform.localScale = Vector3.one * objectScale;
-            instance.transform.localPosition = objectPosition;
-        }
-        else
-        {
-            instance.name = objectName;
-            instance.transform.localScale = Vector3.one * objectScale;
         }
     }
 
@@ -197,7 +134,7 @@ public class ObjectCreatorWindow : EditorWindow
                 }
 
 
-                if (ray.direction.y != 0) // Check to avoid division by zero
+                if (ray.direction.y != 0)
                 {
                     float distanceToGround = -ray.origin.y / ray.direction.y;
                     Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
@@ -206,32 +143,43 @@ public class ObjectCreatorWindow : EditorWindow
                 }
                 else
                 {
-                    previewObject.transform.position = new Vector3(ray.origin.x, objectHeight / 2, ray.origin.z); // or keep it at the original ray position
+                    previewObject.transform.position = new Vector3(ray.origin.x, objectHeight / 2, ray.origin.z);
                 }
             }
 
 
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
-                if (selectedObjectType == TypeOfObject.Primitive)
+                if (UIController.Instance.SelectedObjectType == TypeOfObject.Primitive)
                 {
                     ObjectPlacer.PlaceObject(previewObject, selectedPrimitiveType);
                 }
-                else if (selectedObjectType == TypeOfObject.Prefab)
+                else if (UIController.Instance.SelectedObjectType == TypeOfObject.Prefab)
                 {
                     ObjectPlacer.PlaceObject(previewObject, selectedPrefab);
                 }
 
                 DestroyImmediate(previewObject);
                 isPlacingObject = false;
+                PropertiesManager.Instance.ObjectPosition = Vector3.zero;
+                Repaint();
                 currentEvent.Use();
             }
 
-            if (currentEvent.type == EventType.MouseUp && currentEvent.button == 1)
+            if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
             {
                 DestroyImmediate(previewObject);
                 isPlacingObject = false;
+                PropertiesManager.Instance.ObjectPosition = Vector3.zero;
+                Repaint();
                 currentEvent.Use();
+            }
+
+            if (currentEvent.type == EventType.MouseMove)
+            {
+                PropertiesManager.Instance.ObjectPosition = previewObject.transform.position;
+
+                Repaint();
             }
 
             sceneView.Repaint();
