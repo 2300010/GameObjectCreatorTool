@@ -50,20 +50,16 @@ public class ObjectPlacer
         }
     }
 
-    //public static void SetObjectToStandard(GameObject previewObject)
-    //{
-
-    //}
-
     public static void PlaceObject(GameObject previewObject, PrimitiveType selectedPrimitiveType)
     {
-        // Instantiate the final object at the preview object's position
         GameObject finalObject = GameObject.CreatePrimitive(selectedPrimitiveType);
 
         if (finalObject != null)
         {
+            finalObject.name = previewObject.name;
             finalObject.transform.position = previewObject.transform.position;
-            //SetObjectToTransparent(finalObject, 1f);
+            finalObject.transform.localScale = previewObject.transform.localScale;
+            Selection.activeObject = finalObject;
             Undo.RegisterCreatedObjectUndo(finalObject, "Place Object");
         }
     }
@@ -74,8 +70,10 @@ public class ObjectPlacer
 
         if (finalObject != null)
         {
+            finalObject.name = previewObject.name;
             finalObject.transform.position = previewObject.transform.position;
-            //SetObjectToTransparent(finalObject, 1f);
+            finalObject.transform.localScale = previewObject.transform.localScale;
+            Selection.activeObject = finalObject;
             Undo.RegisterCreatedObjectUndo(finalObject, "Place Object");
         }
     }

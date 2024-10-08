@@ -7,7 +7,7 @@ public enum TypeOfObject { Primitive, Prefab }
 public class ObjectCreatorWindow : EditorWindow
 {
     ObjectPlacer objectPlacer = new ObjectPlacer();
-    
+
     private string objectName = "New Object";
     private float objectScale = 1f;
     private Vector3 objectPosition = Vector3.zero;
@@ -19,12 +19,7 @@ public class ObjectCreatorWindow : EditorWindow
     private GameObject selectedPrefab;
     private GameObject previewObject;
 
-    //private Material previewMaterial;
-
-    //private Material[] originalMaterials = null;
-    //private Renderer[] originalRenderers = null;
-
-    private bool showObjectSettings = false;
+    private bool showObjectSettings = true;
     private bool isPlacingObject = false;
 
     private float objectHeight = 0f;
@@ -45,10 +40,6 @@ public class ObjectCreatorWindow : EditorWindow
         {
             CreatePreviewLayer();
         }
-        //if (previewMaterial == null)
-        //{
-        //    SetPreviewMaterialParameters();
-        //}
         previewLayerMask = ~LayerMask.GetMask(PREVIEW_LAYER);
         SceneView.duringSceneGui += OnSceneGUI;
     }
@@ -79,6 +70,12 @@ public class ObjectCreatorWindow : EditorWindow
             objectName = EditorGUILayout.TextField("Object Name", objectName);
             objectScale = EditorGUILayout.Slider("Object Scale", objectScale, 0.1f, 10f);
             objectPosition = EditorGUILayout.Vector3Field("Object Position", objectPosition);
+            if (GUILayout.Button("Reset Settings To Default"))
+            {
+                SetDefaultObjectParameters();
+            }
+
+            EditorGUILayout.Space(15);
         }
     }
 
@@ -102,16 +99,20 @@ public class ObjectCreatorWindow : EditorWindow
                 if (GUILayout.Button("Instantiate Primitive"))
                 {
                     instance = GameObject.CreatePrimitive(selectedPrimitiveType);
-                    SetGameObjectParameters(instance);
+                    SetGameObjectParameters(instance, isPlacingObject);
+                    Selection.activeGameObject = instance;
 
                     Undo.RegisterCreatedObjectUndo(instance, "Instantiate Primitive");
                 }
+
+                EditorGUILayout.Space(20);
 
                 if (GUILayout.Button("Place Primitive Manually"))
                 {
                     previewObject = objectPlacer.CreatePreviewPrimitiveObject(selectedPrimitiveType);
                     previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
+                    SetGameObjectParameters(previewObject, isPlacingObject);
                 }
                 break;
 
@@ -124,17 +125,20 @@ public class ObjectCreatorWindow : EditorWindow
                     if (GUILayout.Button("Instantiate Prefab"))
                     {
                         instance = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-                        SetGameObjectParameters(instance);
+                        SetGameObjectParameters(instance, isPlacingObject);
+                        Selection.activeGameObject = instance;
 
                         Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
                     }
 
+                    EditorGUILayout.Space(20);
+
                     if (GUILayout.Button("Place Prefab Manually"))
                     {
-
                         previewObject = objectPlacer.CreatePreviewPrefabObject(selectedPrefab);
                         previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
+                        SetGameObjectParameters(previewObject, isPlacingObject);
                     }
                 }
                 else
@@ -145,11 +149,28 @@ public class ObjectCreatorWindow : EditorWindow
         }
     }
 
-    private void SetGameObjectParameters(GameObject instance)
+    private void SetDefaultObjectParameters()
     {
-        instance.name = objectName;
-        instance.transform.localScale = Vector3.one * objectScale;
-        instance.transform.localPosition = objectPosition;
+        GUI.FocusControl(null);
+
+        objectName = "New Object";
+        objectScale = 1f;
+        objectPosition = Vector3.zero;
+    }
+
+    private void SetGameObjectParameters(GameObject instance, bool isPlacingObject)
+    {
+        if (!isPlacingObject)
+        {
+            instance.name = objectName;
+            instance.transform.localScale = Vector3.one * objectScale;
+            instance.transform.localPosition = objectPosition;
+        }
+        else
+        {
+            instance.name = objectName;
+            instance.transform.localScale = Vector3.one * objectScale;
+        }
     }
 
     private void OnSceneGUI(SceneView sceneView)
@@ -175,24 +196,22 @@ public class ObjectCreatorWindow : EditorWindow
                     objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
                 }
 
-                //Debug.Log("Object height = " + objectHeight);
 
                 if (ray.direction.y != 0) // Check to avoid division by zero
                 {
                     float distanceToGround = -ray.origin.y / ray.direction.y;
                     Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
-                    // Set the preview object position to the intersection point
                     previewObject.transform.position = new Vector3(intersectionPoint.x, objectHeight / 2, intersectionPoint.z);
                 }
                 else
                 {
-                    // Handle cases where ray direction is parallel to the ground (y == 0)
                     previewObject.transform.position = new Vector3(ray.origin.x, objectHeight / 2, ray.origin.z); // or keep it at the original ray position
                 }
             }
 
-            if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+
+            if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
                 if (selectedObjectType == TypeOfObject.Primitive)
                 {
@@ -208,7 +227,7 @@ public class ObjectCreatorWindow : EditorWindow
                 currentEvent.Use();
             }
 
-            if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
+            if (currentEvent.type == EventType.MouseUp && currentEvent.button == 1)
             {
                 DestroyImmediate(previewObject);
                 isPlacingObject = false;
@@ -240,16 +259,4 @@ public class ObjectCreatorWindow : EditorWindow
     {
         return LayerMask.NameToLayer(layerName) != -1;
     }
-
-    //private void SetPreviewMaterialParameters()
-    //{
-    //    previewMaterial.SetFloat("_Mode", 3); // Transparent mode for Standard Shader (3)
-    //    previewMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-    //    previewMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-    //    previewMaterial.SetInt("_ZWrite", 0);
-    //    previewMaterial.DisableKeyword("_ALPHATEST_ON");
-    //    previewMaterial.EnableKeyword("_ALPHABLEND_ON");
-    //    previewMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //    previewMaterial.renderQueue = 3000;
-    //}
 }
