@@ -1,6 +1,6 @@
 using UnityEditor;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class ObjectCreatorWindow : EditorWindow
 {
@@ -42,7 +42,7 @@ public class ObjectCreatorWindow : EditorWindow
     {
         UIController.Instance.ShowObjectParametersUI();
 
-        UIController.Instance.ShowSelectGameObjectTypeUI();
+        UIController.Instance.ShowSelectedGameObjectTypeUI();
 
         InstantiateSelectedGameObject();
     }
@@ -118,6 +118,11 @@ public class ObjectCreatorWindow : EditorWindow
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
 
+            if (currentEvent.shift)
+            {
+
+            }
+
             if (Physics.Raycast(ray, out RaycastHit hit, 400f, previewLayerMask))
             {
                 if (hit.collider.gameObject != previewObject)
@@ -181,6 +186,8 @@ public class ObjectCreatorWindow : EditorWindow
 
                 Repaint();
             }
+
+            
 
             sceneView.Repaint();
         }
