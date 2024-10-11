@@ -1,6 +1,5 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ObjectCreatorWindow : EditorWindow
 {
@@ -60,7 +59,7 @@ public class ObjectCreatorWindow : EditorWindow
                 if (GUILayout.Button("Instantiate Primitive"))
                 {
                     instance = GameObject.CreatePrimitive(selectedPrimitiveType);
-                    PropertiesManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
+                    PropertyPanelManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                     Selection.activeGameObject = instance;
 
                     Undo.RegisterCreatedObjectUndo(instance, "Instantiate Primitive");
@@ -73,7 +72,7 @@ public class ObjectCreatorWindow : EditorWindow
                     previewObject = ObjectPlacer.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
                     previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
-                    PropertiesManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
+                    PropertyPanelManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                 }
                 break;
 
@@ -86,7 +85,7 @@ public class ObjectCreatorWindow : EditorWindow
                     if (GUILayout.Button("Instantiate Prefab"))
                     {
                         instance = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
-                        PropertiesManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
+                        PropertyPanelManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                         Selection.activeGameObject = instance;
 
                         Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
@@ -99,7 +98,7 @@ public class ObjectCreatorWindow : EditorWindow
                         previewObject = ObjectPlacer.Instance.CreatePreviewPrefabObject(selectedPrefab);
                         previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
-                        PropertiesManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
+                        PropertyPanelManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                     }
                 }
                 else
@@ -117,10 +116,12 @@ public class ObjectCreatorWindow : EditorWindow
         if (isPlacingObject && previewObject != null)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
+            Selection.activeObject = null;
 
-            if (currentEvent.shift)
+            Renderer previewRenderer = previewObject.GetComponent<Renderer>();
+            if (previewRenderer != null)
             {
-
+                objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
             }
 
             if (Physics.Raycast(ray, out RaycastHit hit, 400f, previewLayerMask))
@@ -132,23 +133,29 @@ public class ObjectCreatorWindow : EditorWindow
             }
             else
             {
-                Renderer previewRenderer = previewObject.GetComponent<Renderer>();
-                if (previewRenderer != null)
-                {
-                    objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
-                }
-
 
                 if (ray.direction.y != 0)
                 {
                     float distanceToGround = -ray.origin.y / ray.direction.y;
                     Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
-                    previewObject.transform.position = new Vector3(intersectionPoint.x, objectHeight / 2, intersectionPoint.z);
-                }
-                else
-                {
-                    previewObject.transform.position = new Vector3(ray.origin.x, objectHeight / 2, ray.origin.z);
+
+                    if (currentEvent.shift)
+                    {
+                        float currentX = previewObject.transform.position.x;
+                        float currentZ = previewObject.transform.position.z;
+
+
+
+                        previewObject.transform.position = new Vector3(currentX, -intersectionPoint.z, currentZ);
+
+                    }
+                    else
+                    {
+                        float currentY = previewObject.transform.position.y;
+
+                        previewObject.transform.position = new Vector3(intersectionPoint.x, currentY, intersectionPoint.z);
+                    }
                 }
             }
 
@@ -166,7 +173,7 @@ public class ObjectCreatorWindow : EditorWindow
 
                 DestroyImmediate(previewObject);
                 isPlacingObject = false;
-                PropertiesManager.Instance.ObjectPosition = Vector3.zero;
+                PropertyPanelManager.Instance.ObjectPosition = Vector3.zero;
                 Repaint();
                 currentEvent.Use();
             }
@@ -175,19 +182,19 @@ public class ObjectCreatorWindow : EditorWindow
             {
                 DestroyImmediate(previewObject);
                 isPlacingObject = false;
-                PropertiesManager.Instance.ObjectPosition = Vector3.zero;
+                PropertyPanelManager.Instance.ObjectPosition = Vector3.zero;
                 Repaint();
                 currentEvent.Use();
             }
 
             if (currentEvent.type == EventType.MouseMove)
             {
-                PropertiesManager.Instance.ObjectPosition = previewObject.transform.position;
+                PropertyPanelManager.Instance.ObjectPosition = previewObject.transform.position;
 
                 Repaint();
             }
 
-            
+
 
             sceneView.Repaint();
         }
