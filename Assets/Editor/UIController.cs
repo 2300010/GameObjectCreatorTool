@@ -22,6 +22,9 @@ public class UIController
     private TypeOfObject selectedObjectType = TypeOfObject.Primitive;
     private bool showObjectSettings = true;
 
+    GUILayoutOption[] resetBtnOptions = { GUILayout.MaxWidth(180) };
+    GUIStyle resetStyle = GUIStyle.none;
+
     public void ShowObjectParametersUI()
     {
         showObjectSettings = EditorGUILayout.Foldout(showObjectSettings, "Object Settings", true);
@@ -29,16 +32,17 @@ public class UIController
         if (showObjectSettings)
         {
             EditorGUILayout.LabelField("Parameters", EditorStyles.boldLabel);
-
-            PropertyPanelManager.Instance.ObjectName = EditorGUILayout.TextField("Object Name", PropertyPanelManager.Instance.ObjectName);
-            PropertyPanelManager.Instance.ObjectScale = EditorGUILayout.Slider("Object Scale", PropertyPanelManager.Instance.ObjectScale, 0.1f, 10f);
-            PropertyPanelManager.Instance.ObjectPosition = EditorGUILayout.Vector3Field("Object Position", PropertyPanelManager.Instance.ObjectPosition);
-            if (GUILayout.Button("Reset Settings To Default"))
+            if (GUILayout.Button("Reset Settings To Default", resetBtnOptions))
             {
                 PropertyPanelManager.Instance.SetDefaultObjectParameters();
             }
 
-            EditorGUILayout.Space(15);
+            GUILayout.Space(8f);
+
+            PropertyPanelManager.Instance.ObjectName = EditorGUILayout.TextField("Name", PropertyPanelManager.Instance.ObjectName);
+            PropertyPanelManager.Instance.ObjectScale = EditorGUILayout.Slider("Scale", PropertyPanelManager.Instance.ObjectScale, 0.1f, 10f);
+            PropertyPanelManager.Instance.ObjectPosition = EditorGUILayout.Vector3Field("Position", PropertyPanelManager.Instance.ObjectPosition);
+
         }
     }
 

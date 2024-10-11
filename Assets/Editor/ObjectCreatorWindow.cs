@@ -11,10 +11,26 @@ public class ObjectCreatorWindow : EditorWindow
     private bool isPlacingObject = false;
 
     private float objectHeight = 0f;
+    private float previousMousePositionOnY;
+    private float currentMousePositionOnY;
+    private float currentMouseDeltaY = 0f;
+    private float previewObjectNewPositionOnY;
 
     Event currentEvent;
     private LayerMask previewLayerMask;
+
+    private GUILayoutOption[] placeObjectBtnOptions = { GUILayout.MinHeight(40) };
+    private GUIStyle placeObjectBtnStyle = new GUIStyle();
+    private GUIStyle basicButtonStyle = new GUIStyle();
+    
+
     private const string PREVIEW_LAYER = "Preview";
+    private const string INSTANTIATE_GAMEOBJECT_BTN_TEXT = "Create GameObject To Default Position";
+    private const string INSTANTIATE_GAMEOBJECT_UNDO_REGISTER = "Instantiate GameObject = ";
+    private const string PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT = "Place GameObject Manually";
+    private const string PREFAB_TEXT = "Prefab ";
+    private const string PRIMITIVE_TEXT = "Primitive ";
+    private const string GAMEOBJECT_TEXT = "GameObject";
 
     [MenuItem("Tools/Object Creator")]
     public static void ShowWindow()
@@ -39,8 +55,8 @@ public class ObjectCreatorWindow : EditorWindow
 
     private void OnGUI()
     {
-        UIController.Instance.ShowObjectParametersUI();
-
+        basicButtonStyle = GUI.skin.button;
+        placeObjectBtnStyle = GUI.skin.button;
         UIController.Instance.ShowSelectedGameObjectTypeUI();
 
         InstantiateSelectedGameObject();
@@ -50,26 +66,41 @@ public class ObjectCreatorWindow : EditorWindow
     {
         GameObject instance;
 
+        //placeObjectBtnStyle.fontSize = 18;
+
         switch (UIController.Instance.SelectedObjectType)
         {
             case TypeOfObject.Primitive:
 
-                selectedPrimitiveType = (PrimitiveType)EditorGUILayout.EnumPopup("Primitive Type", selectedPrimitiveType);
+                selectedPrimitiveType = (PrimitiveType)EditorGUILayout.EnumPopup(PRIMITIVE_TEXT + GAMEOBJECT_TEXT, selectedPrimitiveType);
+                
+                UIController.Instance.ShowObjectParametersUI();
 
-                if (GUILayout.Button("Instantiate Primitive"))
+                if (GUILayout.Button(INSTANTIATE_GAMEOBJECT_BTN_TEXT, basicButtonStyle))
                 {
                     instance = GameObject.CreatePrimitive(selectedPrimitiveType);
                     PropertyPanelManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                     Selection.activeGameObject = instance;
 
-                    Undo.RegisterCreatedObjectUndo(instance, "Instantiate Primitive");
+                    Undo.RegisterCreatedObjectUndo(instance, INSTANTIATE_GAMEOBJECT_UNDO_REGISTER + instance.name);
                 }
+                
 
                 EditorGUILayout.Space(20);
 
-                if (GUILayout.Button("Place Primitive Manually"))
+                if (GUILayout.Button(PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT, placeObjectBtnStyle, placeObjectBtnOptions))
                 {
                     previewObject = ObjectPlacer.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
+                    Renderer previewRenderer = previewObject.GetComponent<Renderer>();
+
+                    if (previewRenderer != null)
+                    {
+                        objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
+                    }
+
+                    previewObjectNewPositionOnY = objectHeight / 2;
+                    Vector3 newPosition = new Vector3(0, previewObjectNewPositionOnY, 0);
+                    previewObject.transform.position += newPosition;
                     previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
                     PropertyPanelManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
@@ -78,24 +109,36 @@ public class ObjectCreatorWindow : EditorWindow
 
             case TypeOfObject.Prefab:
 
-                selectedPrefab = (GameObject)EditorGUILayout.ObjectField("Prefab", selectedPrefab, typeof(GameObject), false);
+                selectedPrefab = (GameObject)EditorGUILayout.ObjectField(PREFAB_TEXT + GAMEOBJECT_TEXT, selectedPrefab, typeof(GameObject), false);
 
                 if (selectedPrefab != null && PrefabUtility.IsPartOfPrefabAsset(selectedPrefab))
                 {
-                    if (GUILayout.Button("Instantiate Prefab"))
+                    if (GUILayout.Button(INSTANTIATE_GAMEOBJECT_BTN_TEXT))
                     {
                         instance = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
                         PropertyPanelManager.Instance.SetGameObjectParameters(instance, isPlacingObject);
                         Selection.activeGameObject = instance;
 
-                        Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
+                        Undo.RegisterCreatedObjectUndo(instance, INSTANTIATE_GAMEOBJECT_UNDO_REGISTER + instance.name);
                     }
+
+                    UIController.Instance.ShowObjectParametersUI();
 
                     EditorGUILayout.Space(20);
 
-                    if (GUILayout.Button("Place Prefab Manually"))
+                    if (GUILayout.Button(PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT, placeObjectBtnStyle, placeObjectBtnOptions))
                     {
                         previewObject = ObjectPlacer.Instance.CreatePreviewPrefabObject(selectedPrefab);
+                        Renderer previewRenderer = previewObject.GetComponent<Renderer>();
+
+                        if (previewRenderer != null)
+                        {
+                            objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
+                        }
+
+                        previewObjectNewPositionOnY = objectHeight / 2;
+                        Vector3 newPosition = new Vector3(0, previewObjectNewPositionOnY, 0);
+                        previewObject.transform.position += newPosition;
                         previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
                         PropertyPanelManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
@@ -118,11 +161,7 @@ public class ObjectCreatorWindow : EditorWindow
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
             Selection.activeObject = null;
 
-            Renderer previewRenderer = previewObject.GetComponent<Renderer>();
-            if (previewRenderer != null)
-            {
-                objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
-            }
+            Vector3 mouseWorldPosition = ray.origin;
 
             if (Physics.Raycast(ray, out RaycastHit hit, 400f, previewLayerMask))
             {
@@ -145,16 +184,16 @@ public class ObjectCreatorWindow : EditorWindow
                         float currentX = previewObject.transform.position.x;
                         float currentZ = previewObject.transform.position.z;
 
+                        previewObjectNewPositionOnY = currentMouseDeltaY;
 
-
-                        previewObject.transform.position = new Vector3(currentX, -intersectionPoint.z, currentZ);
+                        previewObject.transform.position = new Vector3(currentX, previewObjectNewPositionOnY, currentZ);
 
                     }
                     else
                     {
-                        float currentY = previewObject.transform.position.y;
+                        previewObjectNewPositionOnY = previewObject.transform.position.y;
 
-                        previewObject.transform.position = new Vector3(intersectionPoint.x, currentY, intersectionPoint.z);
+                        previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectNewPositionOnY, intersectionPoint.z);
                     }
                 }
             }
@@ -190,6 +229,12 @@ public class ObjectCreatorWindow : EditorWindow
             if (currentEvent.type == EventType.MouseMove)
             {
                 PropertyPanelManager.Instance.ObjectPosition = previewObject.transform.position;
+
+                currentMousePositionOnY = mouseWorldPosition.y;
+
+                currentMouseDeltaY = currentMousePositionOnY - previousMousePositionOnY;
+
+                previousMousePositionOnY = currentMousePositionOnY;
 
                 Repaint();
             }
