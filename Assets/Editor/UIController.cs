@@ -30,12 +30,12 @@ public class UIController
         {
             EditorGUILayout.LabelField("Parameters", EditorStyles.boldLabel);
 
-            PropertyPanelManager.Instance.ObjectName = EditorGUILayout.TextField("Object Name", PropertyPanelManager.Instance.ObjectName);
-            PropertyPanelManager.Instance.ObjectScale = EditorGUILayout.Slider("Object Scale", PropertyPanelManager.Instance.ObjectScale, 0.1f, 10f);
-            PropertyPanelManager.Instance.ObjectPosition = EditorGUILayout.Vector3Field("Object Position", PropertyPanelManager.Instance.ObjectPosition);
+            PropertiesManager.Instance.ObjectName = EditorGUILayout.TextField("Object Name", PropertiesManager.Instance.ObjectName);
+            PropertiesManager.Instance.ObjectScale = EditorGUILayout.Slider("Object Scale", PropertiesManager.Instance.ObjectScale, 0.1f, 10f);
+            PropertiesManager.Instance.ObjectPosition = EditorGUILayout.Vector3Field("Object Position", PropertiesManager.Instance.ObjectPosition);
             if (GUILayout.Button("Reset Settings To Default"))
             {
-                PropertyPanelManager.Instance.SetDefaultObjectParameters();
+                PropertiesManager.Instance.SetDefaultObjectParameters();
             }
 
             EditorGUILayout.Space(15);
