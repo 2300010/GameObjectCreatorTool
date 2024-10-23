@@ -3,11 +3,23 @@
   "WorkspaceRootPath": "C:\\GameObjectCreatorTool\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|C:\\GameObjectCreatorTool\\assets\\editor\\objectcreatorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|c:\\gameobjectcreatortool\\assets\\editor\\objectcreatorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\editor\\objectcreatorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|c:\\gameobjectcreatortool\\assets\\editor\\objectplacer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|c:\\gameobjectcreatortool\\assets\\editor\\timetracker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\editor\\timetracker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|C:\\GameObjectCreatorTool\\assets\\editor\\propertypanelmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\editor\\propertypanelmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|C:\\GameObjectCreatorTool\\assets\\editor\\uicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\editor\\uicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|C:\\GameObjectCreatorTool\\assets\\editor\\objectplacer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E3E760E1-E043-3613-FB73-85C5468B61E2}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\editor\\objectplacer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -22,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 219,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,27 +50,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ToolManager.cs",
-              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ToolManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Editor\\ToolManager.cs",
-              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ToolManager.cs",
-              "RelativeToolTip": "Assets\\Editor\\ToolManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T14:49:05.7Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ObjectPlacer.cs",
-              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ObjectPlacer.cs",
-              "RelativeDocumentMoniker": "Assets\\Editor\\ObjectPlacer.cs",
-              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ObjectPlacer.cs",
-              "RelativeToolTip": "Assets\\Editor\\ObjectPlacer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
+              "Title": "TimeTracker.cs",
+              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\TimeTracker.cs",
+              "RelativeDocumentMoniker": "Assets\\Editor\\TimeTracker.cs",
+              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\TimeTracker.cs",
+              "RelativeToolTip": "Assets\\Editor\\TimeTracker.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwBwAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-04T14:49:05.743Z",
+              "WhenOpened": "2024-10-23T19:29:31.206Z",
               "EditorCaption": ""
             },
             {
@@ -69,10 +69,59 @@
               "RelativeDocumentMoniker": "Assets\\Editor\\ObjectCreatorWindow.cs",
               "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ObjectCreatorWindow.cs",
               "RelativeToolTip": "Assets\\Editor\\ObjectCreatorWindow.cs",
-              "ViewState": "AgIAALwAAAAAAAAAAAAUwNYAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAOsAAAAAAAAAAAAqwP0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-10-04T14:49:05.925Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PropertyPanelManager.cs",
+              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\PropertyPanelManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Editor\\PropertyPanelManager.cs",
+              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\PropertyPanelManager.cs",
+              "RelativeToolTip": "Assets\\Editor\\PropertyPanelManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-23T18:49:37.787Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UIController.cs",
+              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\UIController.cs",
+              "RelativeDocumentMoniker": "Assets\\Editor\\UIController.cs",
+              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\UIController.cs",
+              "RelativeToolTip": "Assets\\Editor\\UIController.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAzwAcAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-23T18:49:09.372Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ToolManager.cs",
+              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ToolManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Editor\\ToolManager.cs",
+              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ToolManager.cs",
+              "RelativeToolTip": "Assets\\Editor\\ToolManager.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwEsAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-04T14:49:05.7Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ObjectPlacer.cs",
+              "DocumentMoniker": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ObjectPlacer.cs",
+              "RelativeDocumentMoniker": "Assets\\Editor\\ObjectPlacer.cs",
+              "ToolTip": "C:\\GameObjectCreatorTool\\Assets\\Editor\\ObjectPlacer.cs",
+              "RelativeToolTip": "Assets\\Editor\\ObjectPlacer.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-04T14:49:05.743Z"
             }
           ]
         }

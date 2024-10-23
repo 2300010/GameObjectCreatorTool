@@ -69,19 +69,19 @@ public class ToolManager : EditorWindow
         }
     }
 
-    //[MenuItem("Tools/Object Creator")]
-    //public static void ShowWindow()
-    //{
-    //    GetWindow<ObjectCreatorWindow>("Object Creator");
-    //}
+    [MenuItem("Tools/Object Creator")]
+    public static void ShowWindow()
+    {
+        GetWindow<ObjectCreatorWindow>("Object Creator");
+    }
 
     //private void OnEnable()
     //{
-        
+
     //}
 
     //private void OnDisable()
     //{
-        
+
     //}
 }
