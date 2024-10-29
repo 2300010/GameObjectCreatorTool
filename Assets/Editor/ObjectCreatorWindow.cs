@@ -11,20 +11,22 @@ public class ObjectCreatorWindow : EditorWindow
     private bool isPlacingObject = false;
 
     private float objectHeight = 0f;
-    private float previousMousePositionOnY;
+    private float previousMousePositionOnY = 0f;
     private float currentMousePositionOnY = 0f;
     private float currentMouseDeltaY = 0f;
-    private float previewObjectNewPositionOnY;
+    private float previewObjectCurrentPositionOnY;
+
+    //VARIABLES FOR NEW TEST OF SHIFT FEATURE
+    private float lockedX;
+    private float lockedZ;
 
     Event currentEvent;
-    //private LayerMask previewLayerMask;
 
     private GUILayoutOption[] placeObjectBtnOptions = { GUILayout.MinHeight(40) };
     private GUIStyle placeObjectBtnStyle = new GUIStyle();
     private GUIStyle basicButtonStyle = new GUIStyle();
 
 
-    //private const string PREVIEW_LAYER = "Preview";
     private const string INSTANTIATE_GAMEOBJECT_BTN_TEXT = "Create GameObject To Default Position";
     private const string INSTANTIATE_GAMEOBJECT_UNDO_REGISTER = "Instantiate GameObject = ";
     private const string PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT = "Place GameObject Manually";
@@ -34,11 +36,6 @@ public class ObjectCreatorWindow : EditorWindow
 
     private void OnEnable()
     {
-        //if (!LayerExists(PREVIEW_LAYER))
-        //{
-        //    CreatePreviewLayer();
-        //}
-        //previewLayerMask = ~LayerMask.GetMask(PREVIEW_LAYER);
         SceneView.duringSceneGui += OnSceneGUI;
         TimeTracker.Instance.StartTimeTracker();
     }
@@ -93,8 +90,8 @@ public class ObjectCreatorWindow : EditorWindow
                         objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
                     }
 
-                    previewObjectNewPositionOnY = objectHeight / 2;
-                    Vector3 newPosition = new Vector3(0, previewObjectNewPositionOnY, 0);
+                    previewObjectCurrentPositionOnY = objectHeight / 2;
+                    Vector3 newPosition = new Vector3(0, previewObjectCurrentPositionOnY, 0);
                     previewObject.transform.position += newPosition;
                     //previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
@@ -131,8 +128,8 @@ public class ObjectCreatorWindow : EditorWindow
                             objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
                         }
 
-                        previewObjectNewPositionOnY = objectHeight / 2;
-                        Vector3 newPosition = new Vector3(0, previewObjectNewPositionOnY, 0);
+                        previewObjectCurrentPositionOnY = objectHeight / 2;
+                        Vector3 newPosition = new Vector3(0, previewObjectCurrentPositionOnY, 0);
                         previewObject.transform.position += newPosition;
                         //previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
@@ -149,8 +146,6 @@ public class ObjectCreatorWindow : EditorWindow
 
     private void OnSceneGUI(SceneView sceneView)
     {
-        TimeTracker.Instance.CalculateEditorDeltaTime();
-
         currentEvent = Event.current;
 
         if (isPlacingObject && previewObject != null)
@@ -168,47 +163,58 @@ public class ObjectCreatorWindow : EditorWindow
 
                 if (currentEvent.shift)
                 {
-                    float currentX = previewObject.transform.position.x;
-                    float currentZ = previewObject.transform.position.z;
+                    //Debug.Log("Mouse world position Y = " + mouseWorldPosition.y);
 
+                    lockedX = previewObject.transform.position.x;
+                    lockedZ = previewObject.transform.position.z;
 
-                    previewObjectNewPositionOnY = currentMousePositionOnY;
+                    if (currentMouseDeltaY != 0f)
+                    {
+                        Debug.Log("Mouse delta Y = " + currentMouseDeltaY);
 
-                    previewObject.transform.position = new Vector3(currentX, previewObjectNewPositionOnY, currentZ);
+                        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + currentMouseDeltaY;
 
-                }
-                else
-                {
-                    previewObjectNewPositionOnY = previewObject.transform.position.y;
+                        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
 
-                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectNewPositionOnY, intersectionPoint.z);
-                }
-            }
-            else
-            {
-                float distanceToGround = ray.origin.y / ray.direction.y;
-                Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
+                        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
+                    }
 
+                    currentMousePositionOnY = currentEvent.mousePosition.y;
 
-                if (currentEvent.shift)
-                {
-                    float currentX = previewObject.transform.position.x;
-                    float currentZ = previewObject.transform.position.z;
+                    currentMouseDeltaY = (currentMousePositionOnY - previousMousePositionOnY) * -1f;
 
-
-                    previewObjectNewPositionOnY = currentMousePositionOnY;
-
-                    previewObject.transform.position = new Vector3(currentX, previewObjectNewPositionOnY, currentZ);
+                    previousMousePositionOnY = currentMousePositionOnY;
 
                 }
                 else
                 {
-                    previewObjectNewPositionOnY = previewObject.transform.position.y;
-
-                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectNewPositionOnY, intersectionPoint.z);
+                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
                 }
             }
+            //else
+            //{
+            //    float distanceToGround = ray.origin.y / ray.direction.y;
+            //    Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
+
+            //    if (currentEvent.shift)
+            //    {
+            //        float currentX = previewObject.transform.position.x;
+            //        float currentZ = previewObject.transform.position.z;
+
+
+            //        previewObjectCurrentPositionOnY = currentMousePositionOnY;
+
+            //        previewObject.transform.position = new Vector3(currentX, previewObjectCurrentPositionOnY, currentZ);
+
+            //    }
+            //    else
+            //    {
+            //        previewObjectCurrentPositionOnY = previewObject.transform.position.y;
+
+            //        previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
+            //    }
+            //}
 
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
@@ -239,44 +245,14 @@ public class ObjectCreatorWindow : EditorWindow
 
             if (currentEvent.type == EventType.MouseMove)
             {
-                Debug.Log("Current mouse y = " + currentMousePositionOnY);
+                //Debug.Log("Current mouse y delta = " + currentMouseDeltaY);
 
                 PropertyPanelManager.Instance.ObjectPosition = previewObject.transform.position;
-
-                currentMousePositionOnY = currentEvent.mousePosition.y;
-
-                currentMouseDeltaY = currentMousePositionOnY - previousMousePositionOnY;
-
-                previousMousePositionOnY = currentMousePositionOnY;
 
                 Repaint();
             }
 
-
-
             sceneView.Repaint();
         }
     }
-
-    //private void CreatePreviewLayer()
-    //{
-    //    SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
-    //    SerializedProperty layersProp = tagManager.FindProperty("layers");
-
-    //    for (int i = 0; i < layersProp.arraySize; i++)
-    //    {
-    //        SerializedProperty layer = layersProp.GetArrayElementAtIndex(i);
-    //        if (string.IsNullOrEmpty(layer.stringValue))
-    //        {
-    //            layer.stringValue = PREVIEW_LAYER; // Assign the layer name
-    //            break;
-    //        }
-    //    }
-    //    tagManager.ApplyModifiedProperties();
-    //}
-
-    //private bool LayerExists(string layerName)
-    //{
-    //    return LayerMask.NameToLayer(layerName) != -1;
-    //}
 }

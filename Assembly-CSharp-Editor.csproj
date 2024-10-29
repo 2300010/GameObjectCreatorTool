@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Assets\Editor\PropertyPanelManager.cs" />
     <Compile Include="Assets\Editor\ObjectCreatorWindow.cs" />
-    <Compile Include="Assets\Editor\NewBehaviourScript.cs" />
     <Compile Include="Assets\Editor\ToolManager.cs" />
     <Compile Include="Assets\Editor\ObjectPlacer.cs" />
     <Compile Include="Assets\Editor\TimeTracker.cs" />
