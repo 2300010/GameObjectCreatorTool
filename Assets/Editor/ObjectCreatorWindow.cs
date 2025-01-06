@@ -147,9 +147,16 @@ public class ObjectCreatorWindow : EditorWindow
     private void OnSceneGUI(SceneView sceneView)
     {
         currentEvent = Event.current;
+        //Debug.Log("Mouse delta = " + currentEvent.mousePosition.y);
 
         if (isPlacingObject && previewObject != null)
         {
+            currentMousePositionOnY = currentEvent.mousePosition.y;
+
+            currentMouseDeltaY = (currentMousePositionOnY - previousMousePositionOnY) * -1f;
+
+            previousMousePositionOnY = currentMousePositionOnY;
+
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
             Selection.activeObject = null;
 
@@ -170,7 +177,7 @@ public class ObjectCreatorWindow : EditorWindow
 
                     if (currentMouseDeltaY != 0f)
                     {
-                        Debug.Log("Mouse delta Y = " + currentMouseDeltaY);
+                        //Debug.Log("Mouse delta Y = " + currentMouseDeltaY);
 
                         float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + currentMouseDeltaY;
 
@@ -179,11 +186,6 @@ public class ObjectCreatorWindow : EditorWindow
                         previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
                     }
 
-                    currentMousePositionOnY = currentEvent.mousePosition.y;
-
-                    currentMouseDeltaY = (currentMousePositionOnY - previousMousePositionOnY) * -1f;
-
-                    previousMousePositionOnY = currentMousePositionOnY;
 
                 }
                 else

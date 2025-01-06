@@ -4,6 +4,13 @@ using UnityEngine;
 public class UIController
 {
     private static UIController instance;
+    public TypeOfObject SelectedObjectType { get => selectedObjectType; set => selectedObjectType = value; }
+
+    private TypeOfObject selectedObjectType = TypeOfObject.Primitive;
+    private bool showObjectSettings = true;
+
+    GUILayoutOption[] resetBtnOptions = { GUILayout.MaxWidth(180) };
+    GUIStyle resetStyle = GUIStyle.none;
 
     public static UIController Instance
     {
@@ -16,15 +23,6 @@ public class UIController
             return instance; 
         }
     }
-
-    public TypeOfObject SelectedObjectType { get => selectedObjectType; set => selectedObjectType = value; }
-
-    private TypeOfObject selectedObjectType = TypeOfObject.Primitive;
-    private bool showObjectSettings = true;
-
-    GUILayoutOption[] resetBtnOptions = { GUILayout.MaxWidth(180) };
-    GUIStyle resetStyle = GUIStyle.none;
-
     public void ShowObjectParametersUI()
     {
         showObjectSettings = EditorGUILayout.Foldout(showObjectSettings, "Object Settings", true);
