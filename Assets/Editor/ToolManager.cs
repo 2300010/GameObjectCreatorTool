@@ -72,7 +72,7 @@ public class ToolManager : EditorWindow
     [MenuItem("Tools/Object Creator")]
     public static void ShowWindow()
     {
-        GetWindow<ObjectCreatorWindow>("Object Creator");
+        GetWindow<EditorWindowManager>("Object Creator");
     }
 
     //private void OnEnable()
