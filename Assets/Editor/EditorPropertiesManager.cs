@@ -32,4 +32,5 @@ public static class EditorPropertiesManager
 
         return worldMouseDelta;
     }
+
 }

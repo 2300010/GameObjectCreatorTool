@@ -3,7 +3,6 @@ using UnityEngine;
 public class ObjectParametersManager
 {
     private static ObjectParametersManager instance;
-
     public static ObjectParametersManager Instance 
     {
         get 
@@ -15,6 +14,7 @@ public class ObjectParametersManager
             return instance;
         } 
     }
+    private ObjectParametersManager() { }
 
     public string ObjectName { get => objectName; set => objectName = value; }
     public float ObjectScale { get => objectScale; set => objectScale = value; }

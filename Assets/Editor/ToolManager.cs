@@ -3,9 +3,9 @@ using UnityEngine;
 
 public enum TypeOfObject { Primitive, Prefab }
 
-public delegate TypeOfObject TypeOfObjectHasChanged(TypeOfObject selectedType);
-public delegate PrimitiveType SelectedPrimitiveTypeChanged(PrimitiveType selectedPrimitiveType);
-public delegate GameObject SelectedPrefabChanged(GameObject selectedPrefab);
+//public delegate TypeOfObject TypeOfObjectHasChanged(TypeOfObject selectedType);
+//public delegate PrimitiveType SelectedPrimitiveTypeChanged(PrimitiveType selectedPrimitiveType);
+//public delegate GameObject SelectedPrefabChanged(GameObject selectedPrefab);
 
 
 public class ToolManager : EditorWindow
@@ -16,9 +16,6 @@ public class ToolManager : EditorWindow
 
     private bool isPlacingObject = false;
     private float objectHeight = 0f;
-    private float previousMousePositionOnY = 0f;
-    private float currentMousePositionOnY = 0f;
-    private float currentMouseDeltaY = 0f;
     private float previewObjectCurrentPositionOnY;
 
     //VARIABLES FOR NEW TEST OF SHIFT FEATURE
@@ -42,23 +39,15 @@ public class ToolManager : EditorWindow
     private const string GAMEOBJECT_TEXT = "GameObject";
     #endregion
 
-    [MenuItem("Tools/Object Creator")]
-    public static void ShowWindow()
-    {
-        GetWindow<ToolManager>("Object Creator");
-    }
-
     private void OnEnable()
     {
         SceneView.duringSceneGui += OnSceneGUI;
         TimeTracker.Instance.StartTimeTracker();
     }
-
     private void OnDisable()
     {
         SceneView.duringSceneGui -= OnSceneGUI;
     }
-
     private void OnGUI()
     {
         basicButtonStyle = GUI.skin.button;
@@ -66,6 +55,12 @@ public class ToolManager : EditorWindow
         ObjectParametersUI.Instance.ShowSelectedGameObjectTypeUI();
 
         InstantiateSelectedGameObject();
+    }
+
+    [MenuItem("Tools/Object Creator")]
+    public static void ShowWindow()
+    {
+        GetWindow<ToolManager>("Object Creator");
     }
 
     private void InstantiateSelectedGameObject()
@@ -96,18 +91,10 @@ public class ToolManager : EditorWindow
 
                 if (GUILayout.Button(PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT, placeObjectBtnStyle, placeObjectBtnOptions))
                 {
-                    previewObject = ObjectPlacer.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
-                    Renderer previewRenderer = previewObject.GetComponent<Renderer>();
+                    previewObject = PreviewManager.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
+                    
+                    SetObjectAboveVirtualGround(previewObject);
 
-                    if (previewRenderer != null)
-                    {
-                        objectHeight = previewRenderer.bounds.size.y * previewObject.transform.localScale.y;
-                    }
-
-                    previewObjectCurrentPositionOnY = objectHeight / 2;
-                    Vector3 newPosition = new Vector3(0, previewObjectCurrentPositionOnY, 0);
-                    previewObject.transform.position += newPosition;
-                    //previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                     isPlacingObject = true;
                     ObjectParametersManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                 }
@@ -134,7 +121,7 @@ public class ToolManager : EditorWindow
 
                     if (GUILayout.Button(PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT, placeObjectBtnStyle, placeObjectBtnOptions))
                     {
-                        previewObject = ObjectPlacer.Instance.CreatePreviewPrefabObject(selectedPrefab);
+                        previewObject = PreviewManager.Instance.CreatePreviewPrefabObject(selectedPrefab);
                         Renderer previewRenderer = previewObject.GetComponent<Renderer>();
 
                         if (previewRenderer != null)
@@ -145,7 +132,6 @@ public class ToolManager : EditorWindow
                         previewObjectCurrentPositionOnY = objectHeight / 2;
                         Vector3 newPosition = new Vector3(0, previewObjectCurrentPositionOnY, 0);
                         previewObject.transform.position += newPosition;
-                        //previewObject.layer = LayerMask.NameToLayer(PREVIEW_LAYER);
                         isPlacingObject = true;
                         ObjectParametersManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                     }
@@ -161,15 +147,10 @@ public class ToolManager : EditorWindow
     private void OnSceneGUI(SceneView sceneView)
     {
         currentEvent = Event.current;
-        //Debug.Log("Mouse delta = " + currentEvent.mousePosition.y);
 
         if (isPlacingObject && previewObject != null)
         {
-            currentMousePositionOnY = currentEvent.mousePosition.y;
-
-            currentMouseDeltaY = (currentMousePositionOnY - previousMousePositionOnY) * -1f;
-
-            previousMousePositionOnY = currentMousePositionOnY;
+            Vector3 mouseDelta = EditorPropertiesManager.GetScreenToSceneMouseDelta(currentEvent.delta, previewObject.transform.position);
 
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
             Selection.activeObject = null;
@@ -179,44 +160,52 @@ public class ToolManager : EditorWindow
             if (ray.direction.y != 0)
             {
                 float distanceToGround = -ray.origin.y / ray.direction.y;
+
+                if (float.IsInfinity(distanceToGround) || float.IsNaN(distanceToGround))
+                {
+                    distanceToGround = 0f;
+                }
+
                 Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
 
-                if (currentEvent.shift)
-                {
-                    //Debug.Log("Mouse world position Y = " + mouseWorldPosition.y);
+                //if (currentEvent.shift)
+                //{
 
-                    lockedX = previewObject.transform.position.x;
-                    lockedZ = previewObject.transform.position.z;
+                //    if (mouseDelta.y != 0f)
+                //    {
+                //        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + mouseDelta.y;
 
-                    if (currentMouseDeltaY != 0f)
-                    {
-                        //Debug.Log("Mouse delta Y = " + currentMouseDeltaY);
+                //        if (float.IsNaN(previewObjectNewPositionOnY) || float.IsInfinity(previewObjectNewPositionOnY))
+                //        {
+                //            previewObjectNewPositionOnY = previewObjectCurrentPositionOnY;
+                //        }
 
-                        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + currentMouseDeltaY;
+                //        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
 
-                        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
-
-                        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
-                    }
+                //        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
+                //    }
 
 
-                }
-                else
-                {
-                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
-                }
+                //}
+                //else
+                //{
+                //    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
+
+                //    lockedX = intersectionPoint.x;
+                //    lockedZ = intersectionPoint.z;
+                //}
             }
 
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
                 if (ObjectParametersUI.Instance.SelectedObjectType == TypeOfObject.Primitive)
                 {
-                    ObjectPlacer.PlaceObject(previewObject, selectedPrimitiveType);
+                    PlacementHandeler.PlaceObject(previewObject, selectedPrimitiveType);
                 }
                 else if (ObjectParametersUI.Instance.SelectedObjectType == TypeOfObject.Prefab)
                 {
-                    ObjectPlacer.PlaceObject(previewObject, selectedPrefab);
+                    PlacementHandeler.PlaceObject(previewObject, selectedPrefab);
                 }
 
                 DestroyImmediate(previewObject);
@@ -237,8 +226,6 @@ public class ToolManager : EditorWindow
 
             if (currentEvent.type == EventType.MouseMove)
             {
-                //Debug.Log("Current mouse y delta = " + currentMouseDeltaY);
-
                 ObjectParametersManager.Instance.ObjectPosition = previewObject.transform.position;
 
                 Repaint();
@@ -247,4 +234,19 @@ public class ToolManager : EditorWindow
             sceneView.Repaint();
         }
     }
+
+    private void SetObjectAboveVirtualGround(GameObject obj)
+    {
+        Renderer previewRenderer = obj.GetComponent<Renderer>();
+
+        if (previewRenderer != null)
+        {
+            objectHeight = previewRenderer.bounds.size.y * obj.transform.localScale.y;
+        }
+
+        previewObjectCurrentPositionOnY = objectHeight / 2;
+        Vector3 newPosition = new Vector3(obj.transform.position.x, previewObjectCurrentPositionOnY, obj.transform.position.z);
+        obj.transform.position = newPosition;
+    }
+
 }

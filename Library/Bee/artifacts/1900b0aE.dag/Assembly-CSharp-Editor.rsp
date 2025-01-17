@@ -378,7 +378,8 @@
 "Assets/Editor/EditorPropertiesManager.cs"
 "Assets/Editor/ObjectParametersManager.cs"
 "Assets/Editor/ObjectParametersUI.cs"
-"Assets/Editor/ObjectPlacer.cs"
+"Assets/Editor/PlacementHandeler.cs"
+"Assets/Editor/PreviewManager.cs"
 "Assets/Editor/TimeTracker.cs"
 "Assets/Editor/ToolManager.cs"
 -langversion:9.0

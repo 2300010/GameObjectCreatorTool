@@ -61,9 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\EditorPropertiesManager.cs" />
+    <Compile Include="Assets\Editor\PlacementHandeler.cs" />
     <Compile Include="Assets\Editor\ObjectParametersManager.cs" />
+    <Compile Include="Assets\Editor\PreviewManager.cs" />
     <Compile Include="Assets\Editor\ToolManager.cs" />
-    <Compile Include="Assets\Editor\ObjectPlacer.cs" />
     <Compile Include="Assets\Editor\ObjectParametersUI.cs" />
     <Compile Include="Assets\Editor\TimeTracker.cs" />
   </ItemGroup>
