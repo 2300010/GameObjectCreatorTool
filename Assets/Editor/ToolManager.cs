@@ -132,6 +132,7 @@ public class ToolManager : EditorWindow
                         previewObjectCurrentPositionOnY = objectHeight / 2;
                         Vector3 newPosition = new Vector3(0, previewObjectCurrentPositionOnY, 0);
                         previewObject.transform.position += newPosition;
+
                         isPlacingObject = true;
                         ObjectParametersManager.Instance.SetGameObjectParameters(previewObject, isPlacingObject);
                     }
@@ -150,8 +151,6 @@ public class ToolManager : EditorWindow
 
         if (isPlacingObject && previewObject != null)
         {
-            Vector3 mouseDelta = EditorPropertiesManager.GetScreenToSceneMouseDelta(currentEvent.delta, previewObject.transform.position);
-
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
             Selection.activeObject = null;
 
@@ -168,33 +167,46 @@ public class ToolManager : EditorWindow
 
                 Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
+                // SHIFT FUNCTION (MOVE OBJECT ON Y AXIS ONLY) TO REWORK!!
+                if (currentEvent.shift && currentEvent.type == EventType.MouseMove)
+                {
 
-                //if (currentEvent.shift)
-                //{
+                    if (currentEvent.delta.y != 0f)
+                    {
+                        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + ((currentEvent.delta.y * -1) / 1.3f);
 
-                //    if (mouseDelta.y != 0f)
-                //    {
-                //        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + mouseDelta.y;
+                        if (float.IsNaN(previewObjectNewPositionOnY) || float.IsInfinity(previewObjectNewPositionOnY))
+                        {
+                            previewObjectNewPositionOnY = previewObjectCurrentPositionOnY;
+                        }
 
-                //        if (float.IsNaN(previewObjectNewPositionOnY) || float.IsInfinity(previewObjectNewPositionOnY))
-                //        {
-                //            previewObjectNewPositionOnY = previewObjectCurrentPositionOnY;
-                //        }
+                        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
 
-                //        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
-
-                //        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
-                //    }
+                        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
+                    }
 
 
-                //}
-                //else
-                //{
-                //    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
+                }
+                else
+                {
+                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
 
-                //    lockedX = intersectionPoint.x;
-                //    lockedZ = intersectionPoint.z;
-                //}
+                    lockedX = intersectionPoint.x;
+                    lockedZ = intersectionPoint.z;
+                }
+            }
+
+
+            //FOR DEBUGGING PURPOSES ONLY!!!!
+            //if (currentEvent.isMouse)
+            //{
+            //    Debug.Log("Mouse delta = " + currentEvent.delta);
+            //}
+
+
+            if (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)
+            {
+                currentEvent.Use();
             }
 
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)

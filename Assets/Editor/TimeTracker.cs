@@ -16,10 +16,10 @@ public class TimeTracker
         }
     }
 
-    public float EditorDeltaTime { get => editorDeltaTime; }
-
     private double lastTimeSinceStartup;
     private float editorDeltaTime;
+
+    public float EditorDeltaTime { get => editorDeltaTime; }
 
     public void StartTimeTracker()
     {
