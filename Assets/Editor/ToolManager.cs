@@ -23,6 +23,7 @@ public class ToolManager : EditorWindow
     private float lockedZ;
 
     Event currentEvent;
+    private double lastFrameTime;
 
     #region GUI Variables
     private GUILayoutOption[] placeObjectBtnOptions = { GUILayout.MinHeight(40) };
@@ -92,7 +93,7 @@ public class ToolManager : EditorWindow
                 if (GUILayout.Button(PLACE_GAMEOBJECT_MANUALLY_BTN_TEXT, placeObjectBtnStyle, placeObjectBtnOptions))
                 {
                     previewObject = PreviewManager.Instance.CreatePreviewPrimitiveObject(selectedPrimitiveType);
-                    
+
                     SetObjectAboveVirtualGround(previewObject);
 
                     isPlacingObject = true;
@@ -149,6 +150,10 @@ public class ToolManager : EditorWindow
     {
         currentEvent = Event.current;
 
+        double currentTime = EditorApplication.timeSinceStartup;
+        float deltaTime = (float)(currentTime - lastFrameTime);
+        lastFrameTime = currentTime;
+
         if (isPlacingObject && previewObject != null)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
@@ -167,33 +172,7 @@ public class ToolManager : EditorWindow
 
                 Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
-                // SHIFT FUNCTION (MOVE OBJECT ON Y AXIS ONLY) TO REWORK!!
-                if (currentEvent.shift && currentEvent.type == EventType.MouseMove)
-                {
-
-                    if (currentEvent.delta.y != 0f)
-                    {
-                        float previewObjectNewPositionOnY = previewObjectCurrentPositionOnY + ((currentEvent.delta.y * -1) / 1.3f);
-
-                        if (float.IsNaN(previewObjectNewPositionOnY) || float.IsInfinity(previewObjectNewPositionOnY))
-                        {
-                            previewObjectNewPositionOnY = previewObjectCurrentPositionOnY;
-                        }
-
-                        previewObject.transform.position = new Vector3(lockedX, previewObjectNewPositionOnY, lockedZ);
-
-                        previewObjectCurrentPositionOnY = previewObjectNewPositionOnY;
-                    }
-
-
-                }
-                else
-                {
-                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
-
-                    lockedX = intersectionPoint.x;
-                    lockedZ = intersectionPoint.z;
-                }
+                previewObject.transform.position = new Vector3(intersectionPoint.x, 0, intersectionPoint.z);
             }
 
 
@@ -203,12 +182,13 @@ public class ToolManager : EditorWindow
             //    Debug.Log("Mouse delta = " + currentEvent.delta);
             //}
 
-
+            //  SCALE FUNCTION LEFT CLICK DOWN
             if (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)
             {
                 currentEvent.Use();
             }
 
+            //  PLACE FUNCTION ON LEFT CLICK UP
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
                 if (ObjectParametersUI.Instance.SelectedObjectType == TypeOfObject.Primitive)
@@ -227,6 +207,7 @@ public class ToolManager : EditorWindow
                 currentEvent.Use();
             }
 
+            //  CANCEL FUNTION ON RIGHT CLICK DOWN
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
             {
                 DestroyImmediate(previewObject);
@@ -235,6 +216,7 @@ public class ToolManager : EditorWindow
                 Repaint();
                 currentEvent.Use();
             }
+
 
             if (currentEvent.type == EventType.MouseMove)
             {
