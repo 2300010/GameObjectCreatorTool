@@ -21,7 +21,7 @@ public class ObjectParametersUI
     private bool showObjectSettings = true;
 
     GUILayoutOption[] resetBtnOptions = { GUILayout.MaxWidth(180) };
-    GUIStyle resetStyle = GUIStyle.none;
+    //GUIStyle resetStyle = GUIStyle.none;
 
     public void ShowObjectParametersUI()
     {

@@ -15,15 +15,15 @@ public class ToolManager : EditorWindow
     private GameObject previewObject;
 
     private bool isPlacingObject = false;
+    private bool isScalingObject = false;
     private float objectHeight = 0f;
     private float previewObjectCurrentPositionOnY;
-
-    //VARIABLES FOR NEW TEST OF SHIFT FEATURE
     private float lockedX;
     private float lockedZ;
 
     Event currentEvent;
-    private double lastFrameTime;
+
+    private float scaleFactor = 0.5f;
 
     #region GUI Variables
     private GUILayoutOption[] placeObjectBtnOptions = { GUILayout.MinHeight(40) };
@@ -43,7 +43,6 @@ public class ToolManager : EditorWindow
     private void OnEnable()
     {
         SceneView.duringSceneGui += OnSceneGUI;
-        TimeTracker.Instance.StartTimeTracker();
     }
     private void OnDisable()
     {
@@ -144,15 +143,15 @@ public class ToolManager : EditorWindow
                 }
                 break;
         }
+
+        EditorGUILayout.Space(5);
+
+        scaleFactor = EditorGUILayout.FloatField("Scale Factor 'TEST'", scaleFactor);
     }
 
     private void OnSceneGUI(SceneView sceneView)
     {
         currentEvent = Event.current;
-
-        double currentTime = EditorApplication.timeSinceStartup;
-        float deltaTime = (float)(currentTime - lastFrameTime);
-        lastFrameTime = currentTime;
 
         if (isPlacingObject && previewObject != null)
         {
@@ -172,25 +171,41 @@ public class ToolManager : EditorWindow
 
                 Vector3 intersectionPoint = ray.origin + ray.direction * distanceToGround;
 
-                previewObject.transform.position = new Vector3(intersectionPoint.x, 0, intersectionPoint.z);
+                if (isScalingObject)
+                {
+                    previewObject.transform.position = new Vector3(lockedX, previewObjectCurrentPositionOnY, lockedZ);
+                }
+                else
+                {
+                    previewObject.transform.position = new Vector3(intersectionPoint.x, previewObjectCurrentPositionOnY, intersectionPoint.z);
+
+                    lockedX = intersectionPoint.x;
+                    lockedZ = intersectionPoint.z;
+                }
+
             }
 
-
-            //FOR DEBUGGING PURPOSES ONLY!!!!
-            //if (currentEvent.isMouse)
+            //if (currentEvent.type == EventType.KeyDown && currentEvent.keyCode == KeyCode.Space)
             //{
-            //    Debug.Log("Mouse delta = " + currentEvent.delta);
+            //    Debug.Log("it works!");
+
+            //    currentEvent.Use();
             //}
+
 
             //  SCALE FUNCTION LEFT CLICK DOWN
             if (currentEvent.type == EventType.MouseDrag && currentEvent.button == 0)
             {
+                PreviewObjectScaling();
+
                 currentEvent.Use();
             }
 
             //  PLACE FUNCTION ON LEFT CLICK UP
             if (currentEvent.type == EventType.MouseUp && currentEvent.button == 0)
             {
+                isScalingObject = false;
+
                 if (ObjectParametersUI.Instance.SelectedObjectType == TypeOfObject.Primitive)
                 {
                     PlacementHandeler.PlaceObject(previewObject, selectedPrimitiveType);
@@ -207,7 +222,7 @@ public class ToolManager : EditorWindow
                 currentEvent.Use();
             }
 
-            //  CANCEL FUNTION ON RIGHT CLICK DOWN
+            //  CANCEL FUNCTION ON RIGHT CLICK DOWN
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
             {
                 DestroyImmediate(previewObject);
@@ -217,7 +232,7 @@ public class ToolManager : EditorWindow
                 currentEvent.Use();
             }
 
-
+            //  MOVE OBJECT FUNCTION
             if (currentEvent.type == EventType.MouseMove)
             {
                 ObjectParametersManager.Instance.ObjectPosition = previewObject.transform.position;
@@ -241,6 +256,14 @@ public class ToolManager : EditorWindow
         previewObjectCurrentPositionOnY = objectHeight / 2;
         Vector3 newPosition = new Vector3(obj.transform.position.x, previewObjectCurrentPositionOnY, obj.transform.position.z);
         obj.transform.position = newPosition;
+    }
+
+    private void PreviewObjectScaling()
+    {
+        isScalingObject = true;
+
+        float scaleAmount = currentEvent.delta.y * scaleFactor;
+        previewObject.transform.localScale += Vector3.one * scaleAmount;
     }
 
 }
