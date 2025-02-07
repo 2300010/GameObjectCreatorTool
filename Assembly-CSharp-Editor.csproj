@@ -66,6 +66,7 @@
     <Compile Include="Assets\Editor\PreviewManager.cs" />
     <Compile Include="Assets\Editor\ToolManager.cs" />
     <Compile Include="Assets\Editor\ObjectParametersUI.cs" />
+    <Compile Include="Assets\Editor\PrefabSelectorWindow.cs" />
     <Compile Include="Assets\Editor\TimeTracker.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -379,6 +379,7 @@
 "Assets/Editor/ObjectParametersManager.cs"
 "Assets/Editor/ObjectParametersUI.cs"
 "Assets/Editor/PlacementHandeler.cs"
+"Assets/Editor/PrefabSelectorWindow.cs"
 "Assets/Editor/PreviewManager.cs"
 "Assets/Editor/TimeTracker.cs"
 "Assets/Editor/ToolManager.cs"
